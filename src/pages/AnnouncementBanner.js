@@ -30,23 +30,55 @@ const AnnouncementBanner = () => {
   if (loading) return null;
 
   return (
-    <div className="absolute top-0 left-0 w-full h-12 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 overflow-hidden z-20">
-      <div className="flex items-center h-full">
+        <div className="absolute top-0 left-0 w-full h-14 bg-gradient-to-r from-teal-900 via-teal-900 to-teal-900 overflow-hidden z-20 border-b border-teal-500/20">
+      {/* Animated background particles */}
+      <div className="absolute inset-0 opacity-30">
+        {[...Array(3)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-teal-400 rounded-full"
+            animate={{
+              x: [0, window.innerWidth || 1200],
+              y: [Math.random() * 56, Math.random() * 56],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: 8 + i * 2,
+              repeat: Infinity,
+              delay: i * 2,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </div>
+      
+      {/* Glass morphism overlay */}
+      <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+      
+      <div className="relative flex items-center h-full">
         <motion.div
           animate={{ x: ["100%", "-100%"] }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="flex items-center whitespace-nowrap text-white font-semibold text-sm"
+          className="flex items-center whitespace-nowrap"
         >
           <div className="flex items-center space-x-8 px-8">
-            <span className="flex items-center space-x-2">
-              <Sparkles className="w-4 h-4" />
-              <span>
+            <span className="flex items-center space-x-3 text-white/90 font-medium text-sm tracking-wide">
+              <motion.div
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              >
+                <Sparkles className="w-5 h-5 text-emerald-300" />
+              </motion.div>
+              <span className="bg-gradient-to-r from-emerald-200 to-cyan-200 bg-clip-text text-transparent font-semibold">
                 {announcement ? announcement.title + ": " + announcement.message : "No announcement at this time."}
               </span>
             </span>
           </div>
         </motion.div>
       </div>
+      
+      {/* Bottom glow effect */}
+      <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-teal-400 to-transparent"></div>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 {
-  "name": "data_package_dashboard",
-  "homepage": "https://kelishub.com",
+  "name": "nova_frontend",
+  "homepage": "https://novamaxgh.vercel.app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
