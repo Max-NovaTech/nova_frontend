@@ -154,11 +154,11 @@ const Announcement = ({ onAnnouncementSaved }) => {
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                       disabled={loading}
-                      maxLength={200}
+                      maxLength={300}
                     />
                     <div className="flex justify-between text-xs text-gray-500 mt-1">
                       <span>Make it clear and engaging</span>
-                      <span>{title.length}/200</span>
+                      <span>{title.length}/300</span>
                     </div>
                   </div>
 
@@ -177,11 +177,11 @@ const Announcement = ({ onAnnouncementSaved }) => {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       disabled={loading}
-                      maxLength={1000}
+                      maxLength={5000}
                     />
                     <div className="flex justify-between text-xs text-gray-500 mt-1">
                       <span>Provide clear details about your announcement</span>
-                      <span>{message.length}/1000</span>
+                      <span>{message.length}/5000</span>
                     </div>
                   </div>
                 </div>

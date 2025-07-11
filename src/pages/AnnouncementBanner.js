@@ -3,6 +3,7 @@ import axios from "axios";
 import BASE_URL from "../endpoints/endpoints";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import "./AnnouncementBanner.css"; // Import the new CSS for marquee
 
 const AnnouncementBanner = () => {
   const [announcement, setAnnouncement] = useState(null);
@@ -29,8 +30,22 @@ const AnnouncementBanner = () => {
 
   if (loading) return null;
 
+  const AnnouncementContent = () => (
+    <span className="flex items-center space-x-3 text-white/90 font-medium text-sm tracking-wide">
+      <motion.div
+        animate={{ rotate: [0, 360] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+      >
+        <Sparkles className="w-5 h-5 text-emerald-300" />
+      </motion.div>
+      <span className="bg-gradient-to-r from-emerald-200 to-cyan-200 bg-clip-text text-transparent font-semibold">
+        {announcement ? announcement.title + ": " + announcement.message : "No announcement at this time."}
+      </span>
+    </span>
+  );
+
   return (
-        <div className="absolute top-0 left-0 w-full h-14 bg-gradient-to-r from-teal-900 via-teal-900 to-teal-900 overflow-hidden z-20 border-b border-teal-500/20">
+    <div className="absolute top-0 left-0 w-full h-14 bg-gradient-to-r from-teal-900 via-teal-900 to-teal-900 overflow-hidden z-20 border-b border-teal-500/20">
       {/* Animated background particles */}
       <div className="absolute inset-0 opacity-30">
         {[...Array(3)].map((_, i) => (
@@ -56,25 +71,12 @@ const AnnouncementBanner = () => {
       <div className="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
       
       <div className="relative flex items-center h-full">
-        <motion.div
-          animate={{ x: ["100%", "-100%"] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="flex items-center whitespace-nowrap"
-        >
-          <div className="flex items-center space-x-8 px-8">
-            <span className="flex items-center space-x-3 text-white/90 font-medium text-sm tracking-wide">
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              >
-                <Sparkles className="w-5 h-5 text-emerald-300" />
-              </motion.div>
-              <span className="bg-gradient-to-r from-emerald-200 to-cyan-200 bg-clip-text text-transparent font-semibold">
-                {announcement ? announcement.title + ": " + announcement.message : "No announcement at this time."}
-              </span>
-            </span>
-          </div>
-        </motion.div>
+        <div className="marquee-content whitespace-nowrap">
+          <div className="flex items-center space-x-8 px-8"><AnnouncementContent /></div>
+          <div className="flex items-center space-x-8 px-8"><AnnouncementContent /></div>
+          <div className="flex items-center space-x-8 px-8"><AnnouncementContent /></div>
+          <div className="flex items-center space-x-8 px-8"><AnnouncementContent /></div>
+        </div>
       </div>
       
       {/* Bottom glow effect */}

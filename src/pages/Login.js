@@ -337,7 +337,7 @@ const Login = () => {
                   <li>All payments should be made to:</li>
                   <ul className="ml-6 space-y-1 mt-1">
                     <li>
-                      Number: <span className="font-semibold text-cyan-300">0247924942</span>
+                      Number: <span className="font-semibold text-cyan-300">0531413817</span>
                     </li>
                     <li>
                       Name:{" "}
@@ -486,7 +486,7 @@ const Login = () => {
             </Dialog.Title>
 
             <p className="text-center text-sm text-emerald-300/70 mb-6">
-              <span className="italic">Effective Date:</span> 01/06/2025
+              <span className="italic">Effective Date:</span> 10/07/2025
             </p>
 
             <div className="space-y-6 text-sm text-emerald-100/80">

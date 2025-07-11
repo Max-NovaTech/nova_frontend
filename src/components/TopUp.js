@@ -87,12 +87,12 @@ const TopUp = ({ setTopUp }) => {
             <div className="space-y-1">
               <div>
                 <span className="text-cyan-400">
-                  PHONE NUMBER : +233 59 631 6991
+                  PHONE NUMBER : +233 53 141 3817
                 </span>
               </div>
               <div>
                 <span className="text-purple-400">
-                  NAME : Yesu Yhorm Azago Kafui
+                  NAME : Maxwell Tandoh
                 </span>
               </div>
               <div>
