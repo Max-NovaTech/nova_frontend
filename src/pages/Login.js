@@ -272,7 +272,7 @@ const Login = () => {
             <div className="mt-8 space-y-4">
               <div className="text-center">
                 <a
-                  href="https://wa.me/233247924942"
+                  href="https://wa.me/233544060817"
                   target="_blank"
                   className="inline-flex items-center space-x-2 text-sm text-emerald-200 hover:text-emerald-400 transition-colors group"
                 >
