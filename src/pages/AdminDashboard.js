@@ -713,9 +713,10 @@ const filteredOrders = useMemo(() => allItems.filter((item) => {
       {
         name: selectedUser.name,
         email: selectedUser.email,
-        password: selectedUser.password,
         role: selectedUser.role || "USER",
         phone: selectedUser.phone,
+        balance: selectedUser.balance,
+        password: selectedUser.password,
         isLoggedIn: selectedUser.isLoggedIn, // include this field
       },
       {
