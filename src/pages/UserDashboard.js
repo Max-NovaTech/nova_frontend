@@ -32,8 +32,9 @@ import OtherProducts from "../components/OtherProducts";
 import DailySalesModal from "../components/DailySalesCard";
 import Sidebar from "../components/Sidebar";
 
-const UserDashboard = ({ setUserRole, userRole }) => {
+const UserDashboard = () => {
   const navigate = useNavigate();
+  const userRole = localStorage.getItem("role");
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -100,9 +101,12 @@ const UserDashboard = ({ setUserRole, userRole }) => {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
       localStorage.removeItem("userId");
-      setUserRole(null); // Reset state to show login screen
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("name");
+      localStorage.removeItem("email");
+      navigate("/login");
     }
-  }, [setUserRole]);
+  }, [navigate]);
 
   // Reset the timer whenever there's user activity
   const resetInactivityTimer = useCallback(() => {
@@ -177,7 +181,7 @@ const UserDashboard = ({ setUserRole, userRole }) => {
   useEffect(() => {
     const role = localStorage.getItem("role");
     if (role !== "USER") {
-      navigate("/");
+      navigate("/Login");
     }
   }, [navigate]);
 

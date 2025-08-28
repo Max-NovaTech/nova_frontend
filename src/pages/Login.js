@@ -1,38 +1,59 @@
 import React, { useState, useEffect } from "react";
 import { Eye, EyeOff, Sparkles, CheckCircle, Mail, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import AnnouncementBanner from "./AnnouncementBanner";
 import { motion } from "framer-motion";
 
 // These would be your actual imports in the real application
 import axios from "axios";
 import BASE_URL from "../endpoints/endpoints";
-import AdminDashboard from "./AdminDashboard";
-import UserDashboard from "./UserDashboard";
-import Premium from "./Premium";
-import OtherDashboard from "./OtherDashboard";
-import Superagent from "./SuperAgent";
-import Normalagent from "./NormalAgent";
 import Logo from "../assets/logo-icon.png";
 import { toast } from "react-toastify";
 import { Dialog } from "@headlessui/react";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [userRole, setUserRole] = useState(() => localStorage.getItem("role"));
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState("");
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   useEffect(() => {
-    const storedRole = localStorage.getItem("role");
-    if (storedRole) {
-      setUserRole(storedRole);
+    // Check if user is already logged in and redirect to appropriate dashboard
+    const token = localStorage.getItem("token");
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    const role = localStorage.getItem("role");
+    
+    // Only redirect if ALL authentication data is present and valid
+    if (token && isLoggedIn === 'true' && role && token.trim() !== '' && role.trim() !== '') {
+      // Navigate to appropriate dashboard based on role
+      const roleRoutes = {
+        'ADMIN': '/admin',
+        'USER': '/user',
+        'PREMIUM': '/premium',
+        'SUPER': '/superagent',
+        'NORMAL': '/normalagent',
+        'Other': '/other'
+      };
+      
+      const route = roleRoutes[role];
+      if (route) {
+        navigate(route, { replace: true });
+      }
+    } else if (token || isLoggedIn || role) {
+      // Clear corrupted/incomplete auth data
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('name');
+      localStorage.removeItem('email');
+      localStorage.removeItem('userId');
     }
-  }, []);
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -63,8 +84,22 @@ const Login = () => {
       localStorage.setItem("isLoggedIn", true);
 
       setTimeout(() => {
-        setUserRole(user.role);
         setLoading(false);
+        
+        // Navigate to appropriate dashboard based on role
+        const roleRoutes = {
+          'ADMIN': '/admin',
+          'USER': '/user',
+          'PREMIUM': '/premium',
+          'SUPER': '/superagent',
+          'NORMAL': '/normalagent',
+          'Other': '/other'
+        };
+        
+        const route = roleRoutes[user.role];
+        if (route) {
+          navigate(route, { replace: true });
+        }
       }, 500);
     } catch (err) {
       setLoading(false);
@@ -84,21 +119,6 @@ const Login = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
-  // Route to appropriate dashboard based on user role
-  if (userRole === "ADMIN") {
-    return <AdminDashboard setUserRole={setUserRole} />;
-  } else if (userRole === "USER") {
-    return <UserDashboard setUserRole={setUserRole} userRole={userRole} />;
-  } else if (userRole === "PREMIUM") {
-    return <Premium setUserRole={setUserRole} userRole={userRole} />;
-  } else if (userRole === "SUPER") {
-    return <Superagent setUserRole={setUserRole} userRole={userRole} />;
-  } else if (userRole === "NORMAL") {
-    return <Normalagent setUserRole={setUserRole} userRole={userRole} />;
-  } else if (userRole === "Other") {
-    return <OtherDashboard setUserRole={setUserRole} userRole={userRole} />;
-  }
 
   return (
       <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-emerald-900 via-teal-900 to-cyan-900 overflow-hidden py-20">

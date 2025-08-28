@@ -29,8 +29,9 @@ import PasteOrders from "../components/PasteOrders";
 import TransactionsModal from "../components/TransactionsModal";
 import OtherProducts from "../components/OtherProducts";
 
-const OtherDashboard = ({ setUserRole, userRole }) => {
+const OtherDashboard = () => {
   const navigate = useNavigate();
+  const userRole = localStorage.getItem("role");
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -61,14 +62,17 @@ const OtherDashboard = ({ setUserRole, userRole }) => {
   const logoutUser = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
-    localStorage.removeItem("userId"); // Optional: Remove user ID if needed
-    setUserRole(null); // Reset state to show login screen
-  }, []);
+    localStorage.removeItem("userId");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("name");
+    localStorage.removeItem("email");
+    navigate("/login");
+  }, [navigate]);
 
   useEffect(() => {
     const role = localStorage.getItem("role");
-    if (role !== "USER") {
-      navigate("/");
+    if (role !== "Other") {
+      navigate("/Login");
     }
   }, [navigate]);
 

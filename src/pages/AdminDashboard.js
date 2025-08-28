@@ -522,9 +522,12 @@ const filteredOrders = useMemo(() => {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
       localStorage.removeItem("userId");
-      setUserRole(null); // Reset state to show login screen
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("name");
+      localStorage.removeItem("email");
+      navigate("/login");
     }
-  }, [setUserRole]);
+  }, [navigate]);
 
   // Reset the timer whenever there's user activity
   const resetInactivityTimer = useCallback(() => {

@@ -29,8 +29,9 @@ import PasteOrders from "../components/PasteOrders";
 import TransactionsModal from "../components/TransactionsModal";
 import OtherProducts from "../components/OtherProducts";
 
-const Premium = ({ setUserRole, userRole }) => {
+const Premium = () => {
   const navigate = useNavigate();
+  const userRole = localStorage.getItem("role");
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -92,14 +93,17 @@ const Premium = ({ setUserRole, userRole }) => {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
       localStorage.removeItem("userId");
-      setUserRole(null); // Reset state to show login screen
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("name");
+      localStorage.removeItem("email");
+      navigate("/login");
     }
-  }, [setUserRole]);
+  }, [navigate]);
 
   useEffect(() => {
     const role = localStorage.getItem("role");
-    if (role !== "USER") {
-      navigate("/");
+    if (role !== "PREMIUM") {
+      navigate("/Login");
     }
   }, [navigate]);
 

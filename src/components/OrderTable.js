@@ -1,21 +1,39 @@
-import { useState, useEffect, useMemo, useRef, useDeferredValue } from "react";
-import axios from "axios";
-import * as XLSX from "xlsx";
+import React, { useState, useEffect, useMemo, useDeferredValue, useCallback, memo, useRef } from 'react';
+import axios from 'axios';
+import BASE_URL from '../endpoints/endpoints';
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
+import * as XLSX from 'xlsx';
+import Swal from 'sweetalert2';
 import {
-  FileText,
-  Bell,
-  Check,
-  SpellCheck,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Filter,
+  Download,
+  RefreshCw,
+  Eye,
+  X,
+  Calendar,
+  User,
+  Phone,
+  CreditCard,
+  Package,
   Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Loader,
+  FileText,
   RotateCcw,
+  Bell,
   CheckSquare,
-} from "lucide-react";
-import { Dialog } from "@headlessui/react";
-import Swal from "sweetalert2";
-import BASE_URL from "../endpoints/endpoints";
+  SpellCheck,
+  Check
+} from 'lucide-react';
 
-const TotalRequestsComponent = () => {
-  const resetAllFilters = () => {
+const TotalRequestsComponent = memo(() => {
+  const resetAllFilters = useCallback(() => {
     setOrderIdFilter("");
     setPhoneNumberFilter("");
     setSelectedProduct("");
@@ -26,7 +44,8 @@ const TotalRequestsComponent = () => {
     setSortOrder("newest");
     setCurrentPage(1);
     setShowNewRequestsOnly(false);
-  };
+  }, []);
+
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [allItems, setAllItems] = useState([]);
@@ -111,15 +130,12 @@ const TotalRequestsComponent = () => {
     };
   }, [autoRefresh, refreshInterval]);
 
-  const fetchOrderData = async () => {
+  const fetchOrderData = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${BASE_URL}/order/admin/allorder`);
-
-
       const currentTime = new Date();
 
-      // Process the data
       if (Array.isArray(response.data)) {
         const itemsList = response.data.flatMap((order) =>
           Array.isArray(order.items)
@@ -130,55 +146,56 @@ const TotalRequestsComponent = () => {
                 user: order.user,
                 order: {
                   ...order,
-                  items: [item], // Only include the current item to avoid status mix-ups
+                  items: [item],
                 },
                 isNew: new Date(order.createdAt) > new Date(Date.now() - 5 * 60 * 1000),
               }))
             : []
         );
 
-        // Check for new items since last fetch
-        //const newItems = itemsList.filter(item => item.isNew).length;
+        // Only update state if data has actually changed
+        setAllItems(prevItems => {
+          const hasChanged = JSON.stringify(prevItems) !== JSON.stringify(itemsList);
+          if (hasChanged) {
+            const currentOrderIds = new Set(response.data.map(order => order.id));
+            const prevOrderIds = prevOrderIdsRef.current;
 
+            if (prevOrderIds.size === 0) {
+              prevOrderIdsRef.current = currentOrderIds;
+            } else {
+              const newOrderIds = [...currentOrderIds].filter(id => !prevOrderIds.has(id));
+              const newOrdersCount = newOrderIds.length;
 
-        const currentOrderIds = new Set(response.data.map(order => order.id));
-        const prevOrderIds = prevOrderIdsRef.current;
-
-        // On first load, just set the initial order IDs
-        if (prevOrderIds.size === 0) {
-          prevOrderIdsRef.current = currentOrderIds;
-        } else {
-          const newOrderIds = [...currentOrderIds].filter(id => !prevOrderIds.has(id));
-          const newOrdersCount = newOrderIds.length;
-
-          if (newOrdersCount > 0) {
-            setHasNewRequests(true);
-            setNewRequestsCount(newOrdersCount);
-            if (notificationsEnabled) {
-              if ("Notification" in window && Notification.permission === "granted") {
-                new Notification("New Orders", {
-                  body: `${newOrdersCount} new order(s) have arrived.`,
-                  icon: "/notification-icon.png",
-                });
-              }
-              if (audioRef.current) {
-                audioRef.current.play().catch(e => console.error("Error playing sound:", e));
+              if (newOrdersCount > 0) {
+                setHasNewRequests(true);
+                setNewRequestsCount(newOrdersCount);
+                if (notificationsEnabled) {
+                  if ("Notification" in window && Notification.permission === "granted") {
+                    new Notification("New Orders", {
+                      body: `${newOrdersCount} new order(s) have arrived.`,
+                      icon: "/notification-icon.png",
+                    });
+                  }
+                  if (audioRef.current) {
+                    audioRef.current.play().catch(e => console.error("Error playing sound:", e));
+                  }
+                }
               }
             }
+            prevOrderIdsRef.current = currentOrderIds;
+            setLastFetchTime(currentTime);
+            localStorage.setItem("lastFetchTime", currentTime.toISOString());
+            return itemsList;
           }
-        }
-
-        prevOrderIdsRef.current = currentOrderIds;
-        setAllItems(itemsList);
-        setLastFetchTime(currentTime);
-        localStorage.setItem("lastFetchTime", currentTime.toISOString()); // Persist the time
+          return prevItems;
+        });
       }
     } catch (error) {
       console.error("Error fetching order data:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [notificationsEnabled]);
 
   // Fetch data on component mount
   useEffect(() => {
@@ -205,7 +222,7 @@ const TotalRequestsComponent = () => {
     }
   }, [notificationsEnabled]);
 
-  const handleBatchCompleteProcessing = async () => {
+  const handleBatchCompleteProcessing = useCallback(async () => {
     // Get all processing orders
     const processingItems = allItems.filter(
       (item) => item.order?.items?.[0]?.status === "Processing"
@@ -300,7 +317,7 @@ const TotalRequestsComponent = () => {
         text: "Failed to update some order statuses. Please check the console for details.",
       });
     }
-  };
+  }, [allItems, fetchOrderData]);
 
   // Apply filters and memoize the result
   const filteredOrders = useMemo(() => {
@@ -389,7 +406,7 @@ const TotalRequestsComponent = () => {
 
   // console.log("All Orders", paginatedItems)
 
-  const handleViewClickStatus = (orderItemId) => {
+  const handleViewClickStatus = useCallback((orderItemId) => {
     // Find the item to check if it's cancelled
     const item = allItems.find((item) => item.id === orderItemId);
     if (item?.order?.items?.[0]?.status === "Cancelled") {
@@ -404,9 +421,9 @@ const TotalRequestsComponent = () => {
     console.log("Order Item", orderItemId);
     setSelectedOrderId(orderItemId);
     setIsOpenStatus(true);
-  };
+  }, [allItems]);
 
-  const handleUpdateStatus = async (orderId) => {
+  const handleUpdateStatus = useCallback(async (orderId) => {
     try {
       Swal.fire({
         title: "Processing...",
@@ -462,9 +479,9 @@ const TotalRequestsComponent = () => {
         text: "Failed to update order status",
       });
     }
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     const currentTime = new Date();
     setLastFetchTime(currentTime);
     localStorage.setItem("lastFetchTime", currentTime.toISOString());
@@ -477,9 +494,9 @@ const TotalRequestsComponent = () => {
     setOpen(false);
     setHasNewRequests(false);
     setNewRequestsCount(0);
-  };
+  }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!selectedOrderId || !selectedStatus) {
       Swal.fire({
         icon: "warning",
@@ -554,9 +571,9 @@ const TotalRequestsComponent = () => {
         text: "Something went wrong while updating the order. Please try again.",
       });
     }
-  };
+  }, [selectedOrderId, selectedStatus]);
 
-  const handleDownloadExcel = async () => {
+  const handleDownloadExcel = useCallback(async () => {
     if (!filteredOrders.length) {
       Swal.fire({
         icon: "warning",
@@ -648,17 +665,17 @@ const TotalRequestsComponent = () => {
         });
       }
     }
-  };
+  }, [filteredOrders, fetchOrderData]);
 
-  const paginate = (pageNumber) => {
+  const paginate = useCallback((pageNumber) => {
     setCurrentPage(pageNumber);
-  };
+  }, []);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     fetchOrderData();
     setHasNewRequests(false);
     setNewRequestsCount(0);
-  };
+  }, [fetchOrderData]);
 
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
 
@@ -1310,6 +1327,6 @@ const TotalRequestsComponent = () => {
       </Dialog>
     </>
   );
-};
+});
 
 export default TotalRequestsComponent;

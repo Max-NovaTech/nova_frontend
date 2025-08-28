@@ -2,13 +2,17 @@ import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import BASE_URL from "./endpoints/endpoints";
+import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
 import Superagent from "./pages/SuperAgent";
 import Normalagent from "./pages/NormalAgent";
+import Premium from "./pages/Premium";
+import OtherDashboard from "./pages/OtherDashboard";
 import Analytics from "./components/AnalyticsPage";
 import Settings from "./components/SettingsPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer, toast } from "react-toastify";
 
 function App() {
@@ -47,14 +51,77 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/user" element={<UserDashboard />} />
-        <Route path="/superagent" element={<Superagent />} />
-        <Route path="/normalagent" element={<Normalagent />} />
-        {/* Dashboard routes */}
-        <Route path="/dashboard/analytics" element={<Analytics />} />
-        <Route path="/dashboard/settings" element={<Settings />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        
+        {/* Protected Dashboard Routes */}
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/user" 
+          element={
+            <ProtectedRoute allowedRoles={['USER']}>
+              <UserDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/premium" 
+          element={
+            <ProtectedRoute allowedRoles={['PREMIUM']}>
+              <Premium />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/superagent" 
+          element={
+            <ProtectedRoute allowedRoles={['SUPER']}>
+              <Superagent />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/normalagent" 
+          element={
+            <ProtectedRoute allowedRoles={['NORMAL']}>
+              <Normalagent />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/other" 
+          element={
+            <ProtectedRoute allowedRoles={['Other']}>
+              <OtherDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Protected Dashboard sub-routes */}
+        <Route 
+          path="/dashboard/analytics" 
+          element={
+            <ProtectedRoute>
+              <Analytics />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/dashboard/settings" 
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          } 
+        />
+        
         {/* Redirect unknown routes */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
