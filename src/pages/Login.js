@@ -632,10 +632,10 @@ const Login = () => {
                   <li>
                     Email:{" "}
                     <a
-                      href="mailto:tandohmaxwell@gmail.com"
+                      href="mailto:novamaxgh@gmail.com"
                       className="text-emerald-500 underline"
                     >
-                      tandohmaxwell@gmail.com
+                      novamaxgh@gmail.com
                     </a>
                   </li>
                   <li>
